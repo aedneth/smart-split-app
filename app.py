@@ -31,8 +31,11 @@ def filtrar_rutinas(datos, nivel, dias, objetivo, genero, frecuencia):
 def app():
     st.markdown(
         """
-        <div style="text-align: center; margin-top: 5px;">
-            <h1 style="font-size: 3rem; font-weight: bold; margin-bottom: 1px;">Smart Split</h1>
+        <div style="text-align: center">
+            <h1 style="font-size: 3rem; font-weight: bold;">Smart Split</h1>
+        </div>
+
+        <div style="text-align: center">
             <p style="font-size: 1.3rem; color: gray;">Sponsored by MEGA GYM</p>
         </div>
         """,
@@ -70,9 +73,16 @@ def app():
             datos_filtrados = datos_filtrados[(datos_filtrados['Género'] == genero) | (datos_filtrados['Género'] == "Masculino, Femenino")]
 
         # Pregunta frecuencia
-        frecuencia = st.selectbox("¿Qué frecuencia de entrenamiento prefieres?", options=["Selecciona una opción", ] + datos_filtrados['Frecuencia'].unique().tolist())
+        frecuencia_map = {1.0: "Baja", 1.5: "Media", 2.0: "Alta"}
+        opciones_frecuencia = ["Selecciona una opción"] + [
+            frecuencia_map[freq] for freq in datos_filtrados['Frecuencia'].unique()
+            if freq in frecuencia_map
+        ]
+        frecuencia = st.selectbox("¿Qué frecuencia de entrenamiento prefieres?", options=opciones_frecuencia)
         if frecuencia != "Selecciona una opción":
-            datos_filtrados = datos_filtrados[datos_filtrados['Frecuencia'] == frecuencia]
+            # Mapear de vuelta a los valores numéricos
+            frecuencia_valor = {v: k for k, v in frecuencia_map.items()}.get(frecuencia)
+            datos_filtrados = datos_filtrados[datos_filtrados['Frecuencia'] == frecuencia_valor]
 
         # Preguntas de personalización
         experiencia_previa = st.selectbox("¿Tienes experiencia previa con algún tipo de entrenamiento?", 
